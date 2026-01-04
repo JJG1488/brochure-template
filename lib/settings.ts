@@ -1,6 +1,9 @@
 import { getSupabaseAdmin, getStoreId } from "./supabase";
+import { getStoreConfig } from "./store";
 
 export interface StoreSettings {
+  // Branding
+  brandColor: string;
   // Hero section
   heroTitle: string;
   heroSubtitle: string;
@@ -30,34 +33,39 @@ export interface StoreSettings {
   seoDescription: string;
 }
 
-const defaultSettings: StoreSettings = {
-  heroTitle: "Welcome to Our Site",
-  heroSubtitle: "Showcasing our work and expertise",
-  heroCta: "View Portfolio",
-  heroCtaLink: "#portfolio",
-  heroImage: "",
-  aboutTitle: "About Us",
-  aboutText: "We are passionate about what we do and committed to delivering excellence.",
-  aboutImage: "",
-  showAbout: true,
-  phoneNumber: "",
-  address: "",
-  businessHours: "",
-  showContactForm: true,
-  socialLinks: {},
-  seoTitle: "",
-  seoDescription: "",
-};
+function getDefaultSettings(): StoreSettings {
+  const store = getStoreConfig();
+  return {
+    brandColor: store.brandColor || "#10b981",
+    heroTitle: "Welcome to Our Site",
+    heroSubtitle: "Showcasing our work and expertise",
+    heroCta: "View Portfolio",
+    heroCtaLink: "#portfolio",
+    heroImage: "",
+    aboutTitle: "About Us",
+    aboutText: "We are passionate about what we do and committed to delivering excellence.",
+    aboutImage: "",
+    showAbout: true,
+    phoneNumber: "",
+    address: "",
+    businessHours: "",
+    showContactForm: true,
+    socialLinks: {},
+    seoTitle: "",
+    seoDescription: "",
+  };
+}
 
 /**
  * Get store settings from the database
  */
 export async function getStoreSettingsFromDB(): Promise<StoreSettings> {
+  const defaults = getDefaultSettings();
   const supabase = getSupabaseAdmin();
   const storeId = getStoreId();
 
   if (!supabase || !storeId) {
-    return defaultSettings;
+    return defaults;
   }
 
   try {
@@ -68,13 +76,13 @@ export async function getStoreSettingsFromDB(): Promise<StoreSettings> {
       .single();
 
     if (data?.settings) {
-      return { ...defaultSettings, ...data.settings };
+      return { ...defaults, ...data.settings };
     }
   } catch {
     // Settings table might not exist yet
   }
 
-  return defaultSettings;
+  return defaults;
 }
 
 /**

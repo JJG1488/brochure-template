@@ -4,17 +4,23 @@ import { useState, useEffect } from "react";
 import { Save, Loader2 } from "lucide-react";
 
 interface StoreSettings {
+  // Appearance
+  brandColor: string;
+  // Hero
   heroTitle: string;
   heroSubtitle: string;
   heroCta: string;
   heroCtaLink: string;
+  // About
   aboutTitle: string;
   aboutText: string;
   showAbout: boolean;
+  // Contact
   phoneNumber: string;
   address: string;
   businessHours: string;
   showContactForm: boolean;
+  // Social
   socialLinks: {
     facebook?: string;
     instagram?: string;
@@ -100,6 +106,102 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-8">
+        {/* Appearance Section */}
+        <section className="bg-white rounded-xl border p-6">
+          <h2 className="text-lg font-semibold mb-4">Appearance</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Brand Color
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="color"
+                  value={settings.brandColor || "#10b981"}
+                  onChange={(e) => setSettings({ ...settings, brandColor: e.target.value })}
+                  className="w-16 h-12 rounded-lg cursor-pointer border border-gray-200"
+                />
+                <input
+                  type="text"
+                  value={settings.brandColor || "#10b981"}
+                  onChange={(e) => setSettings({ ...settings, brandColor: e.target.value })}
+                  placeholder="#10b981"
+                  className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent font-mono"
+                />
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                This color is used for buttons, accents, and highlights throughout your site.
+              </p>
+            </div>
+
+            {/* Preview */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Preview
+              </label>
+              <div className="flex flex-wrap items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <div
+                  className="w-24 h-12 rounded-lg shadow-sm"
+                  style={{ backgroundColor: settings.brandColor || "#10b981" }}
+                />
+                <button
+                  type="button"
+                  className="px-6 py-2.5 rounded-lg font-semibold shadow-sm transition-colors"
+                  style={{ backgroundColor: settings.brandColor || "#10b981", color: "#fff" }}
+                >
+                  Sample Button
+                </button>
+                <span
+                  className="px-3 py-1 rounded-full text-sm font-medium"
+                  style={{
+                    backgroundColor: (settings.brandColor || "#10b981") + "20",
+                    color: settings.brandColor || "#10b981",
+                  }}
+                >
+                  Sample Badge
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Presets */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Quick Presets
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { color: "#10B981", name: "Green" },
+                  { color: "#3B82F6", name: "Blue" },
+                  { color: "#8B5CF6", name: "Purple" },
+                  { color: "#EF4444", name: "Red" },
+                  { color: "#F97316", name: "Orange" },
+                  { color: "#FFD700", name: "Gold" },
+                  { color: "#EC4899", name: "Pink" },
+                  { color: "#14B8A6", name: "Teal" },
+                ].map((preset) => (
+                  <button
+                    key={preset.color}
+                    type="button"
+                    onClick={() => setSettings({ ...settings, brandColor: preset.color })}
+                    className={
+                      "flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors " +
+                      ((settings.brandColor || "").toLowerCase() === preset.color.toLowerCase()
+                        ? "border-gray-900 bg-gray-50"
+                        : "border-gray-200 hover:border-gray-300")
+                    }
+                  >
+                    <div
+                      className="w-5 h-5 rounded-full"
+                      style={{ backgroundColor: preset.color }}
+                    />
+                    <span className="text-sm">{preset.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Hero Section */}
         <section className="bg-white rounded-xl border p-6">
           <h2 className="text-lg font-semibold mb-4">Hero Section</h2>
