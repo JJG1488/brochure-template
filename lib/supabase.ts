@@ -1,11 +1,14 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { createClient as createSupabaseClient, SupabaseClient } from "@supabase/supabase-js";
 
-let supabaseAdmin: ReturnType<typeof createSupabaseClient> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let supabaseAdmin: SupabaseClient<any, any, any> | null = null;
 
 /**
  * Get the Supabase admin client (uses service role for full access)
+ * Returns untyped client since we don't have generated database types
  */
-export function getSupabaseAdmin() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getSupabaseAdmin(): SupabaseClient<any, any, any> | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -32,8 +35,10 @@ export function getStoreId(): string | null {
 
 /**
  * Create a public Supabase client (anon key, for client-side)
+ * Returns untyped client since we don't have generated database types
  */
-export function createClient() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createClient(): SupabaseClient<any, any, any> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   return createSupabaseClient(url, anonKey);
