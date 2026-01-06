@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Save, Loader2 } from "lucide-react";
+import { AIEnhanceButton } from "@/components/AIEnhanceButton";
 
 interface StoreSettings {
   // Appearance
@@ -297,9 +298,18 @@ export default function SettingsPage() {
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent resize-none"
                 placeholder="Tell visitors about yourself or your business..."
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Use double line breaks to create paragraphs
-              </p>
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-xs text-gray-500">
+                  Use double line breaks to create paragraphs
+                </p>
+                <AIEnhanceButton
+                  contentType="about"
+                  contextName={settings.heroTitle || "your site"}
+                  currentText={settings.aboutText}
+                  onEnhanced={(text) => setSettings({ ...settings, aboutText: text })}
+                  disabled={saving}
+                />
+              </div>
             </div>
           </div>
         </section>
