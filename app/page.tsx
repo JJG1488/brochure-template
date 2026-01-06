@@ -4,13 +4,23 @@ import { Testimonials } from "@/components/Testimonials";
 import { About } from "@/components/About";
 import { ContactForm } from "@/components/ContactForm";
 import { getStoreSettingsFromDB } from "@/lib/settings";
-import { getSupabaseAdmin, getStoreId } from "@/lib/supabase";
+import { createFreshAdminClient, getStoreId, isBuildTime } from "@/lib/supabase";
 import { getStoreConfig } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
+/**
+ * Fetch portfolio items using fresh admin client
+ * Uses createFreshAdminClient() to ensure admin panel changes reflect immediately
+ */
 async function getPortfolioItems() {
-  const supabase = getSupabaseAdmin();
+  // During build time, return empty array to avoid errors
+  if (isBuildTime()) {
+    return [];
+  }
+
+  const supabase = createFreshAdminClient();
   const storeId = getStoreId();
 
   if (!supabase || !storeId) return [];
@@ -25,8 +35,17 @@ async function getPortfolioItems() {
   return data || [];
 }
 
+/**
+ * Fetch testimonials using fresh admin client
+ * Uses createFreshAdminClient() to ensure admin panel changes reflect immediately
+ */
 async function getTestimonials() {
-  const supabase = getSupabaseAdmin();
+  // During build time, return empty array to avoid errors
+  if (isBuildTime()) {
+    return [];
+  }
+
+  const supabase = createFreshAdminClient();
   const storeId = getStoreId();
 
   if (!supabase || !storeId) return [];

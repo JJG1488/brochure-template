@@ -1,4 +1,4 @@
-import { getSupabaseAdmin, getStoreId } from "./supabase";
+import { createFreshAdminClient, getStoreId, isBuildTime } from "./supabase";
 import { getStoreConfig } from "./store";
 
 export interface StoreSettings {
@@ -58,10 +58,18 @@ function getDefaultSettings(): StoreSettings {
 
 /**
  * Get store settings from the database
+ * Uses createFreshAdminClient() to avoid Supabase PostgREST caching issues
+ * Uses .limit(1) instead of .single() for additional cache bypass
  */
 export async function getStoreSettingsFromDB(): Promise<StoreSettings> {
   const defaults = getDefaultSettings();
-  const supabase = getSupabaseAdmin();
+
+  // During build time, return defaults to avoid errors
+  if (isBuildTime()) {
+    return defaults;
+  }
+
+  const supabase = createFreshAdminClient();
   const storeId = getStoreId();
 
   if (!supabase || !storeId) {
@@ -69,11 +77,14 @@ export async function getStoreSettingsFromDB(): Promise<StoreSettings> {
   }
 
   try {
-    const { data } = await supabase
+    // Use .limit(1) instead of .single() to bypass PostgREST caching
+    const { data: rows } = await supabase
       .from("store_settings")
       .select("settings")
       .eq("store_id", storeId)
-      .single();
+      .limit(1);
+
+    const data = rows?.[0];
 
     if (data?.settings) {
       return { ...defaults, ...data.settings };
@@ -87,9 +98,14 @@ export async function getStoreSettingsFromDB(): Promise<StoreSettings> {
 
 /**
  * Update store settings in the database
+ * Uses createFreshAdminClient() to ensure write goes through without caching issues
  */
 export async function updateStoreSettings(settings: Partial<StoreSettings>): Promise<boolean> {
-  const supabase = getSupabaseAdmin();
+  if (isBuildTime()) {
+    return false;
+  }
+
+  const supabase = createFreshAdminClient();
   const storeId = getStoreId();
 
   if (!supabase || !storeId) return false;
@@ -101,7 +117,7 @@ export async function updateStoreSettings(settings: Partial<StoreSettings>): Pro
         store_id: storeId,
         settings,
         updated_at: new Date().toISOString(),
-      });
+      }, { onConflict: "store_id" });
 
     return !error;
   } catch {
